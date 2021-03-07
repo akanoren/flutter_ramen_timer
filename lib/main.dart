@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-const int _ramenTimeSec = 10; //180;
+const int _ramenTimeSec = 180;
 
 class _Timer extends ChangeNotifier {
   Timer _currentTimer;
@@ -55,7 +55,7 @@ class _Timer extends ChangeNotifier {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Boiling Ramen is finished!"),
+              title: Text("Boiling Ramen was finished!"),
               actions: [
                 TextButton(
                     child: Text("OK"),

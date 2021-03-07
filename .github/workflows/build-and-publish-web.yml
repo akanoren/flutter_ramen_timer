@@ -1,0 +1,31 @@
+name: build-and-publish-web
+on:
+  push:
+    branch: main
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: main
+      - uses: subosito/flutter-action@v1
+        with:
+            flutter-version: '2.0.1'
+      - run: |
+          set -x
+          git config --global user.email akanoren_github_actions@mail.0pt.jp && git config --global user.name "Github Actions"
+          flutter pub get
+          export REPOSITORY_DIR=$(pwd)
+          export TEMP_REPOSITORY_DIR=$(mktemp -d)
+          flutter build web
+          sed -i build/web/index.html -e 's%base href="/"%base href="/flutter_ramen_timer/"%g'
+          git clone --shared --bare $REPOSITORY_DIR $TEMP_REPOSITORY_DIR
+          cd $TEMP_REPOSITORY_DIR
+          git symbolic-ref HEAD refs/heads/gh-pages
+          git --work-tree=$REPOSITORY_DIR/build/web add --all --verbose
+          git --work-tree=$REPOSITORY_DIR/build/web status --porcelain
+          git --work-tree=$REPOSITORY_DIR/build/web commit -m 'Deploy web contents'
+          git --work-tree=$REPOSITORY_DIR/build/web push origin gh-pages
+          cd $REPOSITORY_DIR
+          git push -f origin gh-pages
